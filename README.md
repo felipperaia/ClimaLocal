@@ -1,6 +1,6 @@
 # Clima Local - App React Native com Expo
 
-![Clima Local](./assets/exemplo.jpg)
+![Clima Local](./assets/explo.jpg)
 
 ---
 
