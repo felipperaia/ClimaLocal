@@ -2,14 +2,16 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, Button, StyleSheet, ActivityIndicator, FlatList } from 'react-native';
 import * as Location from 'expo-location';
 import { saveLocation, getLocation } from '../utils/storage';
-import { fetchWeatherByCoords } from '../utils/api';
+import { fetchWeatherByCoords, saveLocationToDB } from '../utils/api';
 import RetroCard from '../components/RetroCard';
 import ForecastItem from '../components/ForecastItem';
+import { useNavigation } from '@react-navigation/native';
 
 const HomeScreen = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const navigation = useNavigation();
 
   const loadWeather = useCallback(async () => {
     setLoading(true);
@@ -26,6 +28,7 @@ const HomeScreen = () => {
         await saveLocation(loc);
       }
 
+      await saveLocationToDB(loc.lat, loc.lon); // Salvar no MongoDB SEMPRE
       const result = await fetchWeatherByCoords(loc.lat, loc.lon);
       setData(result);
     } catch (err) {
@@ -71,6 +74,7 @@ const HomeScreen = () => {
         />
       )}
       <Button title="Atualizar" onPress={loadWeather} />
+      <Button title="Ver Histórico" onPress={() => navigation.navigate('Histórico')} />
     </View>
   );
 };

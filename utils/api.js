@@ -1,11 +1,22 @@
+const BASE_URL = 'https://backend-clima-local.onrender.com';
+
 export const fetchWeatherByCoords = async (lat, lon) => {
-  const res = await fetch(`https://backend-clima-local.onrender.com/weather/coords?lat=${lat}&lon=${lon}`);
-  if (!res.ok) throw new Error('Failed to fetch weather');
+  const res = await fetch(`${BASE_URL}/weather/coords?lat=${lat}&lon=${lon}`);
+  if (!res.ok) throw new Error('Erro ao buscar clima');
   return res.json();
 };
 
-export const fetchWeatherByCity = async (city) => {
-  const res = await fetch(`https://backend-clima-local.onrender.com/weather?city=${encodeURIComponent(city)}`);
-  if (!res.ok) throw new Error('Failed to fetch weather');
+export const saveLocationToDB = async (lat, lon) => {
+  const res = await fetch(`${BASE_URL}/location/save`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ lat, lon }),
+  });
+  if (!res.ok) throw new Error('Erro ao salvar localização');
+};
+
+export const fetchLocationHistory = async () => {
+  const res = await fetch(`${BASE_URL}/location/history`);
+  if (!res.ok) throw new Error('Erro ao buscar histórico');
   return res.json();
 };

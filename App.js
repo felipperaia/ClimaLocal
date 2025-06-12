@@ -1,27 +1,19 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, Text } from 'react-native';
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from './screens/HomeScreen';
+import HistoryScreen from './screens/HistoryScreen';
+import { Text, View, StyleSheet } from 'react-native';
+
+const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <StatusBar style="dark" />
-      <Text style={styles.header}>🌤️ Clima Local - Win98 Style</Text>
-      <HomeScreen />
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Clima" component={HomeScreen} />
+        <Stack.Screen name="Histórico" component={HistoryScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#bfbfbf', paddingTop: 40 },
-  header: {
-    fontSize: 18,
-    textAlign: 'center',
-    fontWeight: 'bold',
-    backgroundColor: '#000080',
-    color: 'white',
-    padding: 8,
-    borderBottomWidth: 2,
-    borderColor: '#000'
-  }
-});

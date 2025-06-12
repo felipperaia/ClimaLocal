@@ -1,171 +1,223 @@
-# Clima Local - App React Native com Expo
+# Clima Local
+
+**Clima Local** é um aplicativo mobile cross-platform (React Native + Expo) com backend em Node.js que exibe informações meteorológicas em tempo real usando OpenWeatherMap e Google Maps, além de registrar o histórico de locais visitados pelo usuário em um banco de dados MongoDB Atlas.
 
 ---
 
-## Sobre
+## 📌 Recursos Principais
 
-Clima Local é um aplicativo mobile feito em React Native com Expo que exibe a previsão do tempo atual e para os próximos dias com visual retrô, inspirado no estilo clássico.  
-A API de clima está hospedada no backend separado (Render).
+* **Tela Inicial** (Home)
 
----
+  * Detecta e usa a localização atual do usuário.
+  * Exibe dados meteorológicos atuais: temperatura, sensação térmica, umidade, vento, pressão, nascer/pôr do sol.
+  * Exibe previsão para os próximos 5 dias em cards horizontais.
+  * Botões para atualizar dados e acessar o histórico de locais.
 
-## Funcionalidades Principais
+* **Histórico de Localizações** (History)
 
-- Detecta a localização atual do usuário (com permissão)
-- Exibe dados meteorológicos atuais detalhados (temperatura, umidade, vento, nascer e pôr do sol)
-- Armazena a última localização para uso offline inicial
-- Botão para atualizar manualmente as informações do clima
+  * Mapa interativo com `react-native-maps`, marcadores e polilinha representando o trajeto.
+  * Lista de coordenadas (latitude, longitude) com timestamp.
 
----
+* **API Backend**
 
-## Como Funciona (Resumo)
-
-1. O app solicita permissão para acessar localização.  
-2. Se permitido, busca coordenadas geográficas do dispositivo.  
-3. Salva localmente a última localização para evitar pedir permissão toda vez.  
-4. Faz requisição ao backend, que consulta a API de clima real usando a API_KEY armazenada no backend (nunca no app).  
-5. Exibe os dados recebidos com visual estilizado.
+  * **GET** `/weather?city=CityName` – Obter clima por nome de cidade.
+  * **GET** `/weather/coords?lat={lat}&lon={lon}` – Obter clima por coordenadas e endereço formatado (reverse geocoding).
+  * **POST** `/location/save` – Salvar coordenada no MongoDB.
+  * **GET** `/location/history` – Retornar todas as localizações salvas, ordenadas por data decrescente.
 
 ---
 
-## Estrutura e Principais Arquivos
+## 🛠️ Tecnologias
 
-### Componentes
+* **Frontend**
 
-- **RetroCard**  
-  Exibe a previsão atual e detalhes como temperatura, sensação térmica, umidade, vento, pressão e horários de nascer/pôr do sol, com estilo retrô.
+  * React Native + Expo SDK 53
+  * react-native-maps (MapView, Marker, Polyline)
+  * AsyncStorage para cache local
+  * React Navigation (native-stack)
 
-- **ForecastItem**  
-  Mostra previsão diária com data, ícone do tempo e temperatura para cada dia subsequente (usado em FlatList horizontal).
+* **Backend**
 
-### Utilitários
+  * Node.js + Express
+  * MongoDB Atlas (mongoose)
+  * Axios para chamadas HTTP (OpenWeatherMap, Google Geocode)
+  * CORS, dotenv
 
-- **api.js**  
-  Contém funções para buscar dados climáticos via fetch direto ao backend. Exemplo: `fetchWeatherByCoords(lat, lon)`, `fetchWeatherByCity(city)`.  
-  *Importante:* Não armazena nem expõe nenhuma chave da API do serviço de clima, tudo fica no backend.
+* **APIs**
 
-- **storage.js**  
-  Utiliza AsyncStorage para salvar e recuperar a última localização usada (`saveLocation` e `getLocation`).
-
-### Tela Principal
-
-- **HomeScreen**  
-  Controla fluxo principal:  
-  - Gerencia estados de loading, erro e dados climáticos  
-  - Solicita permissão e busca localização  
-  - Busca dados via API  
-  - Exibe `RetroCard` e lista horizontal com `ForecastItem`  
-  - Permite atualizar dados manualmente
-
-### Arquivo de Configuração
-
-- **app.config.js** e **app.json**  
-  Configurações do Expo, incluindo nome do app, ícones, splash screen, orientação, versões e plataformas.
+  * [OpenWeatherMap](https://openweathermap.org/api)
+  * [Google Maps Geocoding API](https://developers.google.com/maps/documentation/geocoding)
 
 ---
 
-## Como Rodar o Projeto
+## 🚀 Pré-requisitos
 
-### Requisitos
+* Node.js (v14+)
+* npm ou yarn
+* Conta no MongoDB Atlas
+* Chaves de API:
 
-- Node.js e npm/yarn instalados
-- Expo CLI (instalado globalmente ou usar via npx)
-- Emulador Android/iOS ou dispositivo físico com Expo Go
-
-### Passos
-
-1. Clone o projeto (ou copie os arquivos).  
-2. Rode `npm install` ou `yarn` para instalar dependências.  
-3. Execute `npm start` ou `yarn start` para iniciar o Expo.  
-4. Conecte seu dispositivo via QR code ou rode em emulador.  
-5. **Lembre:** A API_KEY está no backend remoto!  
-   - O backend deve estar rodando e acessível para que o app funcione corretamente.  
-   - O backend tem as rotas `/weather` para cidade e `/weather/coords` para coordenadas.  
+  * **OWM\_API\_KEY** – OpenWeatherMap
+  * **GMAPS\_API\_KEY** – Google Geocoding
 
 ---
 
-## Tecnologias Utilizadas
+## 🔧 Configuração do Backend
 
-- React Native (via Expo SDK 53)  
-- Expo Location para acesso à localização do dispositivo  
-- AsyncStorage para persistência local  
-- Fetch API para comunicação com backend  
-- JavaScript moderno (React Hooks)
+1. Clone o repositório e acesse a pasta do backend:
 
----
+   ```bash
+   git clone <repo-url>
+   cd Backend-Clima-Local
+   ```
 
-## Explicação Detalhada das Funções e Fluxo
+2. Instale as dependências:
 
-### `fetchWeatherByCoords(lat, lon)`
+   ```bash
+   npm install
+   # ou yarn install
+   ```
 
-Faz uma requisição HTTP GET para o backend, enviando latitude e longitude.  
-Retorna o JSON com dados meteorológicos.  
-A função **não** sabe da API_KEY, pois essa fica no backend.
+3. Crie um arquivo `.env` na raiz do backend contendo:
 
-### `saveLocation(loc)` e `getLocation()`
+   ```env
+   MONGO_URI="<sua-mongodb-uri>"
+   OWM_API_KEY="<sua-openweather-key>"
+   GMAPS_API_KEY="<sua-google-maps-key>"
+   ```
 
-Salvam e recuperam no AsyncStorage o objeto com latitude e longitude da última localização usada.  
-Isso evita pedir permissão toda vez e acelera carregamento.
+4. Inicie o servidor:
 
-### HomeScreen
+   ```bash
+   npm run dev
+   # ou
+   node index.js
+   ```
 
-- **loadWeather**:  
-  Função assíncrona que:  
-  - Verifica AsyncStorage para última localização  
-  - Se não houver, pede permissão de localização e busca coordenadas atuais  
-  - Salva localização no AsyncStorage  
-  - Chama `fetchWeatherByCoords` para buscar dados climáticos no backend  
-  - Atualiza estados de dados, loading e erro conforme resultados
-
-- Renderiza:  
-  - Indicador de loading enquanto busca dados  
-  - Mensagem e botão para tentar novamente em caso de erro  
-  - O componente `RetroCard` com os dados do clima atual  
-  - Uma lista horizontal (`FlatList`) com os próximos dias usando `ForecastItem`  
-  - Botão para atualizar os dados manualmente
+5. O servidor estará disponível em `https://backend-clima-local.onrender.com`.
 
 ---
 
-## Considerações Importantes
+## 🔧 Configuração do Frontend
 
-- **Segurança:**  
-  A chave da API de clima fica no backend, que deve ser mantido seguro e privado. O front-end só consome as rotas do backend.
+1. Acesse a pasta do projeto React Native:
 
-- **Permissões:**  
-  O app pede permissão para usar a localização. Se negada, o usuário verá erro e poderá tentar novamente.
+   ```bash
+   cd App-Expo
+   ```
 
-- **Estilo visual:**  
-  A aparência usa tema retrô simples com cores cinza e azul, bordas pretas, ícones do OpenWeather para clima, garantindo legibilidade e estilo nostálgico.
+2. Instale as dependências:
 
-- **Limitações:**  
-  O app depende do backend estar disponível e funcionando para buscar dados climáticos.
+   ```bash
+   npm install
+   # ou yarn install
+   ```
 
----
+3. Opcional: configure o endpoint do backend se não estiver usando o padrão `https://backend-clima-local.onrender.com` 修改 `BASE_URL` em `utils/api.js`:
 
-## Próximos Passos / Melhorias
+   ```js
+   const BASE_URL = 'https://seu-backend-url.com';
+   ```
 
-- Adicionar busca manual por cidades no front-end  
-- Melhorar tratamento de erros e UX  
-- Adicionar temas claro/escuro  
-- Otimizar layout para tablets e diferentes resoluções  
-- Implementar cache local para dados do clima
+4. Inicie o Expo:
 
----
+   ```bash
+   expo start
+   ```
 
-## Contato
-
-Para dúvidas ou sugestões, entre em contato!
-
----
-
-**Obs:** Não armazene sua API key no front-end. Mantenha-a segura no backend.
+5. Abra no dispositivo ou emulador via QR code.
 
 ---
 
-## Licença
+## ⚙️ Estrutura de Pastas
 
-Projeto aberto para uso pessoal e estudos.
+```
+Backend-Clima-Local/
+├── controllers/
+│   ├── locationController.js
+│   └── weatherController.js
+├── models/
+│   └── Location.js
+├── routes/
+│   ├── location.js
+│   └── weather.js
+├── .env
+└── index.js
+
+App-Expo/
+├── assets/
+│   ├── adaptive-icon.png
+│   ├── favicon.png
+│   ├── icon.png
+│   └── splash.png
+├── components/
+│   ├── ForecastItem.js
+│   ├── RetroCard.js
+│   └── WeatherCard.js
+├── screens/
+│   ├── HomeScreen.js
+│   └── HistoryScreen.js
+├── utils/
+│   ├── api.js
+│   └── storage.js
+├── App.js
+└── app.json
+```
 
 ---
 
-**Obrigado por usar Clima Local!** ☀️🌧️🌈
+## 📖 Uso
+
+* Na tela inicial, permita o acesso à localização.
+* O app salva automaticamente a última localização no AsyncStorage e no MongoDB.
+* Navegue para "Histórico" para ver seu trajeto.
+* Atualize manualmente clicando em "Atualizar".
+
+---
+
+## 📜 API Reference
+
+### Weather
+
+* **GET** `/weather?city=CityName`
+
+  * Parâmetros de query:
+
+    * `city` (string, obrigatório)
+  * Resposta: objeto JSON com dados atuais do clima.
+
+* **GET** `/weather/coords?lat={lat}&lon={lon}`
+
+  * Parâmetros de query:
+
+    * `lat`, `lon` (números, obrigatórios)
+  * Resposta: `{ location: string, weather: object }`.
+
+### Location
+
+* **POST** `/location/save`
+
+  * Body JSON: `{ lat: Number, lon: Number }`
+  * Salva coordenada no MongoDB.
+
+* **GET** `/location/history`
+
+  * Retorna array de objetos `{ lat, lon, timestamp }`, ordenado por `timestamp` decrescente.
+
+---
+
+![Clima Local](./assets/exemplo.jpg)
+
+![Clima Local Atualizado](./assets/exemplo_atualizado.jpg)
+
+![Clima Local Tela 2](./assets/t2_exemplo_atualizado.jpg)
+
+## 🤝 Contribuição
+
+Contribuições são bem-vindas! Faça um fork do projeto, crie uma branch com sua feature (`git checkout -b feature/fooBar`), commit (`git commit -m 'Add fooBar'`), e abra um Pull Request.
+
+---
+
+## 📄 Licença
+
+MIT © \ Felippe Adriel
